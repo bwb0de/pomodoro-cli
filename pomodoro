@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#LICENSE: AGLP-v3.0
+#
+
+
+"""
+
+Temporizador pomodoro para linha de comando
+
+Usage:
+    pomodoro classic
+    pomodoro stop
+    
+Options:
+    --version
+
+"""
+
+import os
+from time import sleep
+
+from docopt import docopt
+from modules.sound import play_bgsnd, stop_bgsnd
+from modules.cli_tools import pick_options, write_to_file, read_from_file
+
+args = docopt(__doc__)
+
+def main():
+    if args['classic']:
+        play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=25, alarm=True) 
+
+
+    elif args['stop']:
+            stop_bgsnd()
+
+
+
+if __name__ == '__main__':
+    main()
