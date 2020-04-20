@@ -10,6 +10,7 @@ Temporizador pomodoro para linha de comando
 
 Usage:
     pomodoro classic
+    pomodoro custom <working_time> <short_interval> <long_interval>
     pomodoro stop
     
 Options:
@@ -23,16 +24,59 @@ from time import sleep
 from docopt import docopt
 from modules.sound import play_bgsnd, stop_bgsnd
 from modules.cli_tools import pick_options, write_to_file, read_from_file
+from subprocess import getoutput
 
 args = docopt(__doc__)
 
+target_process = '.target_pomodoro'
+
+def pomodoro_old_process_kill(target_process_file=target_process):
+    try:
+        old_pid = read_from_file(target_process_file)
+        os.kill(int(old_pid), 15)
+    except FileNotFoundError: pass
+    except ProcessLookupError: pass
+
+
+def pomodoro_struct(working_time, short_interval, long_interval):
+    cicles = 1
+    while True:
+        play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=working_time, alarm=True)
+        sleep(working_time*60)
+        if cicles < 5:
+            op = getoutput('zenity --question --text="Iniciar intervalo curto?" --no-wrap; echo $?')
+            interval_time = short_interval
+        else:
+            op = getoutput('zenity --question --text="Iniciar intervalo longo?" --no-wrap; echo $?')
+            interval_time = long_interval
+            cicles = 0
+
+        if op == '1':
+            pomodoro_old_process_kill()
+            stop_bgsnd()
+            exit()
+        else:
+            play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=interval_time, alarm=True)
+            sleep(interval_time*60)
+            cicles += 1
+
+
 def main():
     if args['classic']:
-        play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=25, alarm=True) 
+        independent_process = os.fork()
+        if independent_process == 0:
+            write_to_file(str(os.getpid()), target_process)
+            pomodoro_struct(25, 5, 15)
 
+    elif args['custom']:
+        independent_process = os.fork()
+        if independent_process == 0:
+            write_to_file(str(os.getpid()), target_process)
+            pomodoro_struct(int(args['<working_time>']), int(args['<short_interval>']), int(args['<long_interval>']))
 
     elif args['stop']:
-            stop_bgsnd()
+        pomodoro_old_process_kill()
+        stop_bgsnd()
 
 
 
