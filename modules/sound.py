@@ -28,7 +28,7 @@ def play_bgsnd(filename, filefolder=pasta_sons_de_fundo, loop=False, alarm=False
         write_to_file(str(os.getpid()), target_bg_snd)
         filename_obj = vlc.MediaPlayer(filefolder+filename)
         filename_obj.play()
-        sleep(2)
+        sleep(1)
         duration = (filename_obj.get_length() / 1000)
         sleep(duration)
         os.remove(target_bg_snd)
@@ -40,10 +40,8 @@ def play_bgsnd(filename, filefolder=pasta_sons_de_fundo, loop=False, alarm=False
             while loop:
                 loop -= 1
                 play(filefolder, filename)
-        else:
-            play(filefolder, filename)
-        
-        if alarm:
-            play(filefolder, "alarm-ring.ogg")
+
+            if alarm:
+                play(filefolder, "alarm-ring.ogg")
 
 
