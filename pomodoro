@@ -40,9 +40,22 @@ def pomodoro_old_process_kill(target_process_file=target_process):
 
 def pomodoro_struct(working_time, short_interval, long_interval):
     cicles = 1
+    ask_question = False
+    
     while True:
-        play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=working_time, alarm=True)
-        sleep(working_time*60)
+        if ask_question:
+            op = getoutput('zenity --question --text="Iniciar pomodoro?" --no-wrap; echo $?')
+            if op == '1':
+                pomodoro_old_process_kill()
+                stop_bgsnd()
+                exit()
+            else:
+                play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=working_time, alarm=True)
+
+        else:
+            ask_question = True
+            play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=working_time, alarm=True)
+
         if cicles < 5:
             op = getoutput('zenity --question --text="Iniciar intervalo curto?" --no-wrap; echo $?')
             interval_time = short_interval
@@ -57,7 +70,6 @@ def pomodoro_struct(working_time, short_interval, long_interval):
             exit()
         else:
             play_bgsnd("clock-ticking.ogg", filefolder="snd/", loop=interval_time, alarm=True)
-            sleep(interval_time*60)
             cicles += 1
 
 

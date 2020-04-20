@@ -33,15 +33,12 @@ def play_bgsnd(filename, filefolder=pasta_sons_de_fundo, loop=False, alarm=False
         sleep(duration)
         os.remove(target_bg_snd)
 
-    independent_process = os.fork()
+    if loop:
+        while loop:
+            loop -= 1
+            play(filefolder, filename)
 
-    if independent_process == 0:
-        if loop:
-            while loop:
-                loop -= 1
-                play(filefolder, filename)
-
-            if alarm:
-                play(filefolder, "alarm-ring.ogg")
+        if alarm:
+            play(filefolder, "alarm-ring.ogg")
 
 
